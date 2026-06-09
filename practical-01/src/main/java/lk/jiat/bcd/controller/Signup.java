@@ -16,36 +16,39 @@ public class Signup extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         String name = request.getParameter("name");
         String mobile = request.getParameter("mobile");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
+        if (name == null || name.isEmpty() || mobile == null || mobile.isEmpty() ||
+                email == null || email.isEmpty() || password == null || password.isEmpty()) {
+
+            request.setAttribute("error", "Please fill out all fields.");
+            request.getRequestDispatcher("signup.jsp").forward(request, response);
+            return;
+        }
+
         ServletContext context = getServletContext();
-        ArrayList<User> users = new ArrayList<>();
+        ArrayList<User> users = (ArrayList<User>) context.getAttribute("users");
 
-        if (context.getAttribute("users") == null) {
+        if (users == null) {
+            users = new ArrayList<>();
             context.setAttribute("users", users);
-        } else {
-            users = (ArrayList<User>) context.getAttribute("users");
         }
 
-        response.setContentType("text/html");
-
-        if (!name.isEmpty() && !mobile.isEmpty() && !email.isEmpty() && !password.isEmpty()) {
-            for (User user : users) {
-                if (user.getEmail().equals(email)) {
-                    response.getWriter().write("<h3>" + email + " is already in use, please choose another one.</h3><a href='signup.jsp'>Go Back</a>");
-                    return;
-                }
+        for (User user : users) {
+            if (user.getEmail().equals(email)) {
+                request.setAttribute("error", "Email is already in use. Please choose another.");
+                request.getRequestDispatcher("signup.jsp").forward(request, response);
+                return;
             }
-
-            User user = new User(name, mobile, email, password);
-            users.add(user);
-
-            response.getWriter().write("<h3>Account created successfully!</h3><a href='signin.jsp'>Click here to Sign In</a>");
-        } else {
-            response.getWriter().write("<h3>Please fill out all fields.</h3><a href='signup.jsp'>Go Back</a>");
         }
+
+        User user = new User(name, mobile, email, password);
+        users.add(user);
+
+        response.sendRedirect("signin.jsp?success=true");
     }
 }

@@ -19,23 +19,22 @@ public class Signin extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        response.setContentType("text/html");
-
         if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
-            response.getWriter().write("<h3>Please enter both email and password.</h3><a href='signin.jsp'>Go Back</a>");
+            request.setAttribute("error", "Please enter both email and password.");
+            request.getRequestDispatcher("signin.jsp").forward(request, response);
             return;
         }
 
         ServletContext context = getServletContext();
+        ArrayList<User> users = (ArrayList<User>) context.getAttribute("users");
 
-        if (context.getAttribute("users") == null) {
-            response.getWriter().write("<h3>No accounts found. Please sign up first!</h3><a href='signup.jsp'>Go to Sign Up</a>");
+        if (users == null || users.isEmpty()) {
+            request.setAttribute("error", "No accounts found. Please sign up first.");
+            request.getRequestDispatcher("signin.jsp").forward(request, response);
             return;
         }
 
-        ArrayList<User> users = (ArrayList<User>) context.getAttribute("users");
         User matchedUser = null;
-
         for (User user : users) {
             if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
                 matchedUser = user;
@@ -47,7 +46,8 @@ public class Signin extends HttpServlet {
             request.getSession().setAttribute("loggedInUser", matchedUser);
             response.sendRedirect("profile.jsp");
         } else {
-            response.getWriter().write("<h3>Invalid email or password. Please try again.</h3><a href='signin.jsp'>Go Back</a>");
+            request.setAttribute("error", "Invalid email or password. Please try again.");
+            request.getRequestDispatcher("signin.jsp").forward(request, response);
         }
     }
 }
