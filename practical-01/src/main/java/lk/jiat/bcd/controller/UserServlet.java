@@ -25,7 +25,6 @@ public class UserServlet extends HttpServlet{
         user.setName(name);
         user.setMobile(mobile);
 
-
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();
         out.println("Name:"+ user.getName());
