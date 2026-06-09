@@ -26,9 +26,9 @@ public class Signup extends HttpServlet {
         ArrayList<User> users = new ArrayList<>();
 
         if (context.getAttribute("users") == null) {
-            users = (ArrayList<User>) context.getAttribute("users");
-        } else {
             context.setAttribute("users", users);
+        } else {
+            users = (ArrayList<User>) context.getAttribute("users");
         }
 
         if (!name.isEmpty() && !mobile.isEmpty() && !email.isEmpty() && !password.isEmpty()) {
@@ -45,5 +45,7 @@ public class Signup extends HttpServlet {
         } else {
 
         }
+        response.setContentType("text/html");
+        response.getWriter().write("<h3>Account created successfully!</h3>");
     }
 }
