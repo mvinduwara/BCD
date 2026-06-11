@@ -1,0 +1,5 @@
+module TestApp {
+    interface Hello {
+        string sayHello();
+    };
+};
