@@ -1,6 +1,7 @@
 package lk.jiat.rmi;
 
 import lk.jiat.rmi.Client.Message;
+import lk.jiat.rmi.model.Data;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -12,5 +13,10 @@ public class MessageImpl extends UnicastRemoteObject implements Message {
     @Override
     public String hello() throws RemoteException {
         return "server: hello world...........";
+    }
+
+    @Override
+    public Data getData() throws RemoteException {
+        return new Data(10,"App Version");
     }
 }

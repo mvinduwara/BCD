@@ -1,6 +1,7 @@
 package lk.jiat.rmi;
 
 import lk.jiat.rmi.Client.Message;
+import lk.jiat.rmi.model.Data;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -17,7 +18,9 @@ public class RMIClient {
             }
 
             Message message = (Message) registry.lookup("message_service");
-           String msg = message.hello();
+            String msg = message.hello();
+
+            Data data  = message.getData();
 
             System.out.println(msg.toString());
         } catch (Exception e) {
