@@ -1,15 +1,16 @@
 package lk.jiat.rmi;
 
-import java.rmi.Remote;
+import lk.jiat.rmi.Client.Message;
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class MessageImpl extends UnicastRemoteObject implements Message, Remote {
+public class MessageImpl extends UnicastRemoteObject implements Message {
 
     MessageImpl() throws RemoteException {}
 
     @Override
-    public void hello() {
-        System.out.println("server: hello world...........");
+    public String hello() throws RemoteException {
+        return "server: hello world...........";
     }
 }

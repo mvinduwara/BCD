@@ -9,7 +9,7 @@ public class RMIServer {
 
         try {
             Registry registry = LocateRegistry.createRegistry(6000);
-            registry.rebind("message service", new MessageImpl());
+            registry.rebind("message_service", new MessageImpl());
 
             System.out.println("RMI Server ready");
         } catch (RemoteException e) {
