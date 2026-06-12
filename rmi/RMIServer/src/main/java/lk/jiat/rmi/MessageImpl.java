@@ -19,4 +19,9 @@ public class MessageImpl extends UnicastRemoteObject implements Message {
     public Data getData() throws RemoteException {
         return new Data(10,"App Version");
     }
+
+    @Override
+    public String getresult(int num1, int num2) throws RemoteException {
+        return "Result is "+num1+","+num2;
+    }
 }
