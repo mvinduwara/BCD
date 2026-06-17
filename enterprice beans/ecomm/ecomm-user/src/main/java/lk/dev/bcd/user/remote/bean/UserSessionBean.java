@@ -3,6 +3,7 @@ package lk.dev.bcd.user.remote.bean;
 import jakarta.ejb.Stateless;
 import lk.dev.bcd.user.remote.UserRemote;
 import lk.dev.bcd.user.remote.dto.UserDTO;
+import org.w3c.dom.ls.LSOutput;
 
 import java.util.List;
 
@@ -12,27 +13,27 @@ public class UserSessionBean implements UserRemote {
 
     @Override
     public UserDTO getUser(Long id) {
-        return null;
+        return new UserDTO();
     }
 
     @Override
     public UserDTO createUser(UserDTO user) {
-        return null;
+        return new UserDTO();
     }
 
     @Override
     public UserDTO updateUser(UserDTO user) {
-        return null;
+        return new UserDTO();
     }
 
     @Override
     public UserDTO getUserByEmail(String email) {
-        return null;
+        return new UserDTO();
     }
 
     @Override
-    public UserDTO deleteUser(Long id) {
-        return null;
+    public void deleteUser(Long id) {
+        System.out.println("User Deleted Sucessfully : deleteUser");
     }
 
     @Override

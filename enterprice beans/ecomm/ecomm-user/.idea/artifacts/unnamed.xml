@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="ejb-jar" name="unnamed">
+    <output-path>$PROJECT_DIR$/out/artifacts/unnamed</output-path>
+    <root id="archive" name="unnamed.jar">
+      <element id="module-output" name="ecomm-user" />
+    </root>
+  </artifact>
+</component>

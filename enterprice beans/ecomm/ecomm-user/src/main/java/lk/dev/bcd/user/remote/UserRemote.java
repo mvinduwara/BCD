@@ -16,7 +16,7 @@ public interface UserRemote {
 
     UserDTO getUserByEmail(String email);
 
-    UserDTO deleteUser(Long id);
+    void deleteUser(Long id);
 
     List<UserDTO> getAllUsers();
 }
