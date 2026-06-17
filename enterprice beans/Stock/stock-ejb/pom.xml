@@ -7,12 +7,22 @@
     <groupId>lk.dev.bcd</groupId>
     <artifactId>stock-ejb</artifactId>
     <version>1.0</version>
+    <packaging>ejb</packaging>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-web-api</artifactId>
+            <version>10.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -21,7 +31,7 @@
                 <artifactId>maven-ejb-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
-                    
+                    <generateClient>true</generateClient>
                 </configuration>
             </plugin>
         </plugins>
