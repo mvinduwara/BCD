@@ -31,7 +31,6 @@
 <div class="signup-container">
     <h2>Create Account</h2>
 
-    <%-- Displays errors from Signup.java if validations fail --%>
     <% if(request.getAttribute("error") != null) { %>
     <div class="error-msg"><%= request.getAttribute("error") %></div>
     <% } %>
