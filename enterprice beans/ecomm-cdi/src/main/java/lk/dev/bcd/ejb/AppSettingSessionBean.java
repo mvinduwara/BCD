@@ -3,6 +3,7 @@ package lk.dev.bcd.ejb;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.Singleton;
 import jakarta.inject.Inject;
+import lk.dev.bcd.annotations.Email;
 import lk.dev.bcd.cdi.EmailNotifier;
 import lk.dev.bcd.cdi.MyService;
 import lk.dev.bcd.cdi.NotificationService;
@@ -21,16 +22,18 @@ public class AppSettingSessionBean implements AppSetting {
 
 //    @Inject
 //    private EmailNotifier emailNotifier;
-//
+
 //    @Inject
 //    private SMSNotifier smsNotifier;
 
     @Inject
+    @Email
     private NotificationService notificationService;
 
     @Override
     public String getName() {
         myService.doSomething();
+        notificationService.notify("Hello This Is My App Setting Session Bean");
         return "Ecomm EE App";
     }
 
