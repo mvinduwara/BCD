@@ -16,10 +16,11 @@ public class App {
             TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
             Topic topic = (Topic) context.lookup("myTopic");
 
-            TopicSubscriber subscriber = session.createSubscriber(topic);
+            TopicPublisher publisher = session.createPublisher(topic);
 
-            Message message = subscriber.receive();
-            System.out.println(message);
+            TextMessage textMessage = session.createTextMessage();
+            textMessage.setText("Hello, This is First Message");
+            publisher.publish(textMessage);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
