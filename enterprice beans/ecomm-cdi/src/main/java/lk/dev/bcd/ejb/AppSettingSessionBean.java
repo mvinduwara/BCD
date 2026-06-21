@@ -2,6 +2,7 @@ package lk.dev.bcd.ejb;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.Singleton;
+import jakarta.inject.Inject;
 import lk.dev.bcd.cdi.MyService;
 import lk.dev.bcd.ejb.remote.AppSetting;
 
@@ -10,7 +11,7 @@ public class AppSettingSessionBean implements AppSetting {
 
     private MyService myService;
 
-    @PostConstruct
+    @Inject
     public void init() {
         myService = new MyService();
     }
