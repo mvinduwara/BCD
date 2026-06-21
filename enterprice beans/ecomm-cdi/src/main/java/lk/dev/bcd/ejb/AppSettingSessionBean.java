@@ -17,6 +17,7 @@ public class AppSettingSessionBean implements AppSetting {
 
     @Override
     public String getName() {
+        myService.doSomething();
         return "Ecomm EE App";
     }
 
