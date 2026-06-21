@@ -1,10 +1,19 @@
 package lk.dev.bcd.ejb;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.ejb.Singleton;
+import lk.dev.bcd.cdi.MyService;
 import lk.dev.bcd.ejb.remote.AppSetting;
 
 @Singleton
 public class AppSettingSessionBean implements AppSetting {
+
+    private MyService myService;
+
+    @PostConstruct
+    public void init() {
+        myService = new MyService();
+    }
 
     @Override
     public String getName() {
