@@ -18,10 +18,26 @@ public class App {
 
                 TopicSubscriber subscriber = session.createSubscriber(topic);
 
-            Message message = subscriber.receive();
-            System.out.println(message);
+//            Message message = subscriber.receive();
+//            System.out.println(message);
+
+            subscriber.setMessageListener(new MessageListener() {
+
+                @Override
+                public void onMessage(Message message) {
+                    try {
+                        String msg = message.getBody(String.class);
+                        System.out.println(msg);
+                    } catch (JMSException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        while (true){}
     }
 }
