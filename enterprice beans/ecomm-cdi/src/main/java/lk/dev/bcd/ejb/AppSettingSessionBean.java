@@ -2,6 +2,7 @@ package lk.dev.bcd.ejb;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.Singleton;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import lk.dev.bcd.annotations.Email;
 import lk.dev.bcd.cdi.EmailNotifier;
@@ -27,6 +28,9 @@ public class AppSettingSessionBean implements AppSetting {
 //    private SMSNotifier smsNotifier;
 
     @Inject
+    private Event<String> event;
+
+    @Inject
     @Email
     private NotificationService notificationService;
 
@@ -34,6 +38,7 @@ public class AppSettingSessionBean implements AppSetting {
     public String getName() {
         myService.doSomething();
         notificationService.notify("Hello This Is My App Setting Session Bean");
+        event.fire("Hello This Is My App Setting Session Bean");
         return "Ecomm EE App";
     }
 
