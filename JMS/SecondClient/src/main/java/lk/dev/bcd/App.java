@@ -3,6 +3,7 @@ package lk.dev.bcd;
 import jakarta.jms.*;
 
 import javax.naming.InitialContext;
+import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) {
@@ -18,9 +19,19 @@ public class App {
 
             TopicPublisher publisher = session.createPublisher(topic);
 
-            TextMessage textMessage = session.createTextMessage();
-            textMessage.setText("Hello, This is First Message");
-            publisher.publish(textMessage);
+            Scanner sc =new Scanner(System.in);
+            System.out.println("Enter the message to be published: ");
+
+            while(true){
+              String line =  sc.nextLine();
+
+              if (line.equalsIgnoreCase("exit")){
+                  break;
+              }
+                TextMessage textMessage = session.createTextMessage();
+                textMessage.setText("Hello, This is First Message");
+                publisher.publish(textMessage);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
