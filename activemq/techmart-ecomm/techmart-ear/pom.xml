@@ -39,8 +39,9 @@
                 <artifactId>maven-ear-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <version>8</version>
+                    <version>10</version>
                     <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <generateApplicationXml>true</generateApplicationXml>
                     <modules>
                         <ejbModule>
                             <groupId>com.techmart</groupId>
