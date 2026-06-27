@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 @WebServlet("/orders/*")
@@ -35,10 +34,13 @@ public class OrderServlet extends HttpServlet {
 
         if (pathInfo == null || pathInfo.equals("/")) {
             handleListOrders(req, resp);
+            return;
         } else if (pathInfo.equals("/checkout")) {
             handleCheckoutPage(req, resp);
+            return;
         } else {
             handleGetOrder(req, resp, pathInfo);
+            return;
         }
     }
 
@@ -50,19 +52,22 @@ public class OrderServlet extends HttpServlet {
 
         if (pathInfo != null && pathInfo.equals("/place")) {
             handlePlaceOrder(req, resp);
+            return;
         } else if (pathInfo != null && pathInfo.startsWith("/cancel/")) {
             handleCancelOrder(req, resp, pathInfo);
+            return;
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
     }
 
     private void handleListOrders(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        long start        = System.currentTimeMillis();
+        long start          = System.currentTimeMillis();
         HttpSession session = req.getSession(true);
-        String customerId = (String) session.getAttribute("customerId");
+        String customerId   = (String) session.getAttribute("customerId");
 
         List<Order> orders;
         if (customerId != null) {
@@ -75,7 +80,7 @@ public class OrderServlet extends HttpServlet {
         req.setAttribute("orders",      orders);
         req.setAttribute("queryTimeMs", elapsed);
 
-        req.getRequestDispatcher("/index.jsp").forward(req, resp);
+        req.getRequestDispatcher("/orders.jsp").forward(req, resp);
     }
 
     private void handleCheckoutPage(HttpServletRequest req, HttpServletResponse resp)
@@ -101,16 +106,17 @@ public class OrderServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            Long orderId  = Long.parseLong(pathInfo.substring(1));
-            Order order   = orderProcessingBean.findById(orderId);
+            Long orderId = Long.parseLong(pathInfo.substring(1));
+            Order order  = orderProcessingBean.findById(orderId);
 
             if (order == null) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Order not found: " + orderId);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                        "Order not found: " + orderId);
                 return;
             }
 
             req.setAttribute("order", order);
-            req.getRequestDispatcher("/index.jsp").forward(req, resp);
+            req.getRequestDispatcher("/orders.jsp").forward(req, resp);
 
         } catch (NumberFormatException e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid order ID");
@@ -132,7 +138,8 @@ public class OrderServlet extends HttpServlet {
         }
 
         try {
-            Map<Long, Integer> productQuantities = shoppingCartBean.getProductQuantityMap();
+            java.util.Map<Long, Integer> productQuantities =
+                    shoppingCartBean.getProductQuantityMap();
 
             if (productQuantities.isEmpty()) {
                 session.setAttribute("orderError", "Your cart is empty.");
@@ -140,16 +147,16 @@ public class OrderServlet extends HttpServlet {
                 return;
             }
 
-            Order order     = orderProcessingBean.placeOrder(customerId, email, productQuantities);
-            long elapsed    = System.currentTimeMillis() - start;
+            Order order  = orderProcessingBean.placeOrder(
+                    customerId, email, productQuantities);
+            long elapsed = System.currentTimeMillis() - start;
 
             shoppingCartBean.checkout();
             session.removeAttribute("cartInitialized");
 
             logger.info("Order " + order.getId() + " placed in " + elapsed + "ms");
-            session.setAttribute("lastOrderId",      order.getId());
-            session.setAttribute("lastOrderTotal",   order.getTotalAmount());
-            session.setAttribute("orderSuccess",     "Order #" + order.getId() + " placed successfully!");
+            session.setAttribute("orderSuccess",
+                    "Order #" + order.getId() + " placed successfully!");
 
             resp.sendRedirect(req.getContextPath() + "/orders/");
 
@@ -165,15 +172,18 @@ public class OrderServlet extends HttpServlet {
             throws IOException {
 
         try {
-            Long orderId = Long.parseLong(pathInfo.substring("/cancel/".length()));
+            Long orderId = Long.parseLong(
+                    pathInfo.substring("/cancel/".length()));
             orderProcessingBean.cancelOrder(orderId);
 
-            req.getSession().setAttribute("orderSuccess", "Order #" + orderId + " cancelled.");
+            req.getSession().setAttribute("orderSuccess",
+                    "Order #" + orderId + " cancelled.");
             resp.sendRedirect(req.getContextPath() + "/orders/");
 
         } catch (Exception e) {
             logger.severe("Order cancellation failed: " + e.getMessage());
-            req.getSession().setAttribute("orderError", "Cancellation failed: " + e.getMessage());
+            req.getSession().setAttribute("orderError",
+                    "Cancellation failed: " + e.getMessage());
             resp.sendRedirect(req.getContextPath() + "/orders/");
         }
     }
