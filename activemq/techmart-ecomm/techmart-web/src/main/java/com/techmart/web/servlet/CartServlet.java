@@ -30,10 +30,13 @@ public class CartServlet extends HttpServlet {
 
         if (pathInfo == null || pathInfo.equals("/")) {
             handleViewCart(req, resp);
+            return;
         } else if (pathInfo.equals("/clear")) {
             handleClearCart(req, resp);
+            return;
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
     }
 
@@ -45,12 +48,16 @@ public class CartServlet extends HttpServlet {
 
         if (pathInfo == null || pathInfo.equals("/")) {
             handleAddItem(req, resp);
+            return;
         } else if (pathInfo.equals("/update")) {
             handleUpdateItem(req, resp);
+            return;
         } else if (pathInfo.equals("/remove")) {
             handleRemoveItem(req, resp);
+            return;
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
     }
 
@@ -60,10 +67,10 @@ public class CartServlet extends HttpServlet {
         long start = System.currentTimeMillis();
         ensureCartInitialized(req);
 
-        List<CartItem> items  = shoppingCartBean.getItems();
-        double total          = shoppingCartBean.getTotal();
-        int itemCount         = shoppingCartBean.getItemCount();
-        long elapsed          = System.currentTimeMillis() - start;
+        List<CartItem> items = shoppingCartBean.getItems();
+        double total         = shoppingCartBean.getTotal();
+        int itemCount        = shoppingCartBean.getItemCount();
+        long elapsed         = System.currentTimeMillis() - start;
 
         req.setAttribute("cartItems",   items);
         req.setAttribute("cartTotal",   total);
@@ -86,11 +93,11 @@ public class CartServlet extends HttpServlet {
 
             if (added) {
                 logger.info("Added product " + productId + " x" + quantity + " to cart");
-                resp.sendRedirect(req.getContextPath() + "/cart/");
+                req.getSession().setAttribute("cartSuccess", "Item added to cart successfully.");
             } else {
                 req.getSession().setAttribute("cartError", "Insufficient stock for requested quantity.");
-                resp.sendRedirect(req.getContextPath() + "/cart/");
             }
+            resp.sendRedirect(req.getContextPath() + "/cart/");
 
         } catch (NumberFormatException e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid product data");
@@ -109,7 +116,8 @@ public class CartServlet extends HttpServlet {
             boolean updated = shoppingCartBean.updateQuantity(productId, newQuantity);
 
             if (!updated) {
-                req.getSession().setAttribute("cartError", "Could not update quantity. Check available stock.");
+                req.getSession().setAttribute("cartError",
+                        "Could not update quantity. Check available stock.");
             }
             resp.sendRedirect(req.getContextPath() + "/cart/");
 
@@ -142,8 +150,8 @@ public class CartServlet extends HttpServlet {
     }
 
     private void ensureCartInitialized(HttpServletRequest req) {
-        HttpSession session    = req.getSession(true);
-        String customerId      = (String) session.getAttribute("customerId");
+        HttpSession session   = req.getSession(true);
+        String customerId     = (String) session.getAttribute("customerId");
 
         if (customerId == null) {
             customerId = "GUEST-" + session.getId().substring(0, 8).toUpperCase();
