@@ -1,7 +1,7 @@
 package com.techmart.web.servlet;
 
-import com.techmart.ejb.stateless.ProductCatalogBean;
 import com.techmart.ejb.singleton.InventoryManagerBean;
+import com.techmart.ejb.stateless.ProductCatalogBean;
 import com.techmart.model.Product;
 import jakarta.ejb.EJB;
 import jakarta.servlet.ServletException;
@@ -29,17 +29,21 @@ public class ProductServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        long start = System.currentTimeMillis();
+        long start    = System.currentTimeMillis();
         String pathInfo = req.getPathInfo();
 
         if (pathInfo == null || pathInfo.equals("/")) {
             handleListProducts(req, resp, start);
+            return;
         } else if (pathInfo.startsWith("/category/")) {
             handleByCategory(req, resp, pathInfo, start);
+            return;
         } else if (pathInfo.startsWith("/search")) {
             handleSearch(req, resp, start);
+            return;
         } else {
             handleGetProduct(req, resp, pathInfo, start);
+            return;
         }
     }
 
@@ -51,8 +55,10 @@ public class ProductServlet extends HttpServlet {
 
         if (pathInfo == null || pathInfo.equals("/")) {
             handleCreateProduct(req, resp);
+            return;
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
     }
 
@@ -61,10 +67,10 @@ public class ProductServlet extends HttpServlet {
             throws ServletException, IOException {
 
         List<Product> products = productCatalogBean.findAll();
-        long elapsed = System.currentTimeMillis() - start;
+        long elapsed           = System.currentTimeMillis() - start;
 
-        req.setAttribute("products", products);
-        req.setAttribute("queryTimeMs", elapsed);
+        req.setAttribute("products",         products);
+        req.setAttribute("queryTimeMs",      elapsed);
         req.setAttribute("inventoryManager", inventoryManagerBean);
 
         logger.info("Listed " + products.size() + " products in " + elapsed + "ms");
@@ -76,14 +82,14 @@ public class ProductServlet extends HttpServlet {
                                   String pathInfo, long start)
             throws ServletException, IOException {
 
-        String category = pathInfo.substring("/category/".length());
+        String category        = pathInfo.substring("/category/".length());
         List<Product> products = productCatalogBean.findByCategory(category);
-        long elapsed = System.currentTimeMillis() - start;
+        long elapsed           = System.currentTimeMillis() - start;
 
-        req.setAttribute("products", products);
-        req.setAttribute("queryTimeMs", elapsed);
-        req.setAttribute("selectedCategory", category);
-        req.setAttribute("inventoryManager", inventoryManagerBean);
+        req.setAttribute("products",          products);
+        req.setAttribute("queryTimeMs",       elapsed);
+        req.setAttribute("selectedCategory",  category);
+        req.setAttribute("inventoryManager",  inventoryManagerBean);
 
         req.getRequestDispatcher("/products.jsp").forward(req, resp);
     }
@@ -99,11 +105,11 @@ public class ProductServlet extends HttpServlet {
         }
 
         List<Product> products = productCatalogBean.searchByName(keyword);
-        long elapsed = System.currentTimeMillis() - start;
+        long elapsed           = System.currentTimeMillis() - start;
 
-        req.setAttribute("products", products);
-        req.setAttribute("queryTimeMs", elapsed);
-        req.setAttribute("searchKeyword", keyword);
+        req.setAttribute("products",         products);
+        req.setAttribute("queryTimeMs",      elapsed);
+        req.setAttribute("searchKeyword",    keyword);
         req.setAttribute("inventoryManager", inventoryManagerBean);
 
         req.getRequestDispatcher("/products.jsp").forward(req, resp);
@@ -115,19 +121,20 @@ public class ProductServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            Long productId = Long.parseLong(pathInfo.substring(1));
+            Long productId  = Long.parseLong(pathInfo.substring(1));
             Product product = productCatalogBean.findById(productId);
-            long elapsed = System.currentTimeMillis() - start;
+            long elapsed    = System.currentTimeMillis() - start;
 
             if (product == null) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Product not found: " + productId);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                        "Product not found: " + productId);
                 return;
             }
 
             int stock = inventoryManagerBean.getStock(productId);
-            req.setAttribute("product", product);
-            req.setAttribute("stock", stock);
-            req.setAttribute("queryTimeMs", elapsed);
+            req.setAttribute("product",      product);
+            req.setAttribute("stock",        stock);
+            req.setAttribute("queryTimeMs",  elapsed);
 
             req.getRequestDispatcher("/products.jsp").forward(req, resp);
 
@@ -141,13 +148,13 @@ public class ProductServlet extends HttpServlet {
             throws IOException {
 
         try {
-            String name        = req.getParameter("name");
-            String description = req.getParameter("description");
-            double price       = Double.parseDouble(req.getParameter("price"));
-            int stock          = Integer.parseInt(req.getParameter("stockQuantity"));
-            String category    = req.getParameter("category");
+            String name    = req.getParameter("name");
+            String desc    = req.getParameter("description");
+            double price   = Double.parseDouble(req.getParameter("price"));
+            int stock      = Integer.parseInt(req.getParameter("stockQuantity"));
+            String category = req.getParameter("category");
 
-            Product product = new Product(name, description, price, stock, category);
+            Product product = new Product(name, desc, price, stock, category);
             productCatalogBean.save(product);
 
             logger.info("Product created: " + name);
