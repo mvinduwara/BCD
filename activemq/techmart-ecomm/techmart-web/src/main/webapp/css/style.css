@@ -202,3 +202,30 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .footer { background: #111; color: #888; text-align: center; padding: 1rem;
     font-size: 0.8rem; margin-top: auto; }
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.2rem;
+    margin-top: 1rem;
+}
+.info-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1.2rem;
+}
+.info-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+.info-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+.info-card p {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.5;
+}
+
