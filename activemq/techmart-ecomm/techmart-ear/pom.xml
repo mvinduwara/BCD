@@ -42,15 +42,18 @@
                     <version>10</version>
                     <defaultLibBundleDir>lib</defaultLibBundleDir>
                     <generateApplicationXml>true</generateApplicationXml>
+                    <skinnyWars>true</skinnyWars>
                     <modules>
                         <ejbModule>
                             <groupId>com.techmart</groupId>
                             <artifactId>techmart-ejb</artifactId>
+                            <bundleDir>/</bundleDir>
                         </ejbModule>
                         <webModule>
                             <groupId>com.techmart</groupId>
                             <artifactId>techmart-web</artifactId>
                             <contextRoot>/techmart</contextRoot>
+                            <bundleDir>/</bundleDir>
                         </webModule>
                     </modules>
                 </configuration>

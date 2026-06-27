@@ -18,26 +18,26 @@ public class Order implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "customer_id", nullable = false)
     private String customerId;
 
-    @Column(nullable = false)
+    @Column(name = "customer_email", nullable = false)
     private String customerEmail;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private Status status;
 
-    @Column(nullable = false)
+    @Column(name = "total_amount", nullable = false)
     private double totalAmount;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column
+    @Column(name = "processing_time_ms")
     private long processingTimeMs;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

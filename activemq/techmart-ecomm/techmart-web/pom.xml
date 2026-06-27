@@ -21,12 +21,14 @@
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.techmart</groupId>
             <artifactId>techmart-ejb</artifactId>
             <version>${project.version}</version>
             <type>ejb</type>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -38,6 +40,7 @@
                 <version>3.4.0</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <packagingExcludes>WEB-INF/lib/techmart-ejb*.jar</packagingExcludes>
                 </configuration>
             </plugin>
         </plugins>
