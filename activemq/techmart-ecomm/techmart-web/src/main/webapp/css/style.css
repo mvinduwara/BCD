@@ -1554,3 +1554,27 @@ select.form-input {
     .modal-overlay { align-items: flex-end; padding: 0; }
     .modal-form .form-row { flex-direction: column; }
 }
+
+/* ── Auth Navbar Additions ───────────────────────────────────── */
+.nav-user {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--grey-800);
+    padding: 0.4rem 0.75rem;
+    background: var(--grey-100);
+    border-radius: var(--radius);
+}
+
+.nav-role-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: #556b2f;
+    color: var(--white);
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+}
+
+.nav-logout {
+    margin-left: 0.25rem;
+}
