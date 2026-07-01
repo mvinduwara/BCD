@@ -154,6 +154,43 @@ function logPageLoadTime() {
     });
 }
 
+// ── Add Product Modal ─────────────────────────────────────────────
+
+function initAddProductModal() {
+    const overlay   = document.getElementById('addProductModal');
+    const openBtn   = document.getElementById('openAddProductModal');
+    const closeBtn  = document.getElementById('closeAddProductModal');
+    const cancelBtn = document.getElementById('cancelAddProduct');
+
+    if (!overlay || !openBtn) return;
+
+    function openModal() {
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        const firstInput = overlay.querySelector('input, select, textarea');
+        if (firstInput) setTimeout(() => firstInput.focus(), 100);
+    }
+
+    function closeModal() {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    openBtn.addEventListener('click', openModal);
+    if (closeBtn)  closeBtn.addEventListener('click',  closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('open')) {
+            closeModal();
+        }
+    });
+}
+
 // ─── Init All ─────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -162,5 +199,6 @@ document.addEventListener('DOMContentLoaded', function () {
     initCartFeedback();
     initOrderCancelConfirm();
     initCheckoutToggle();
+    initAddProductModal();
     logPageLoadTime();
 });
