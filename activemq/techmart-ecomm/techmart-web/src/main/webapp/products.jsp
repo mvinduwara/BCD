@@ -54,9 +54,14 @@
                 </c:otherwise>
             </c:choose>
         </h1>
-        <c:if test="${not empty queryTimeMs}">
-            <span class="perf-badge">Query: ${queryTimeMs}ms</span>
-        </c:if>
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+            <c:if test="${not empty queryTimeMs}">
+                <span class="perf-badge">Query: ${queryTimeMs}ms</span>
+            </c:if>
+            <button class="btn-primary" id="openAddProductModal">
+                + Add Product
+            </button>
+        </div>
     </div>
 
     <div class="toolbar">
@@ -145,47 +150,97 @@
         </c:otherwise>
     </c:choose>
 
-    <div class="section">
-        <h2>Add New Product</h2>
+</div>
+
+<!-- ── Add Product Modal ────────────────────────────────────────── -->
+<div class="modal-overlay" id="addProductModal">
+    <div class="modal">
+
+        <div class="modal-header">
+            <h2 class="modal-title">Add New Product</h2>
+            <button class="modal-close" id="closeAddProductModal"
+                    aria-label="Close modal">&#10005;</button>
+        </div>
+
         <form method="post"
               action="${pageContext.request.contextPath}/products/"
-              class="product-form">
-            <div class="form-row">
-                <input type="text"
-                       name="name"
-                       placeholder="Product Name"
-                       class="form-input"
-                       required/>
-                <input type="text"
-                       name="category"
-                       placeholder="Category"
-                       class="form-input"
-                       required/>
+              class="modal-form">
+
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label class="form-label">Product Name *</label>
+                    <input type="text"
+                           name="name"
+                           placeholder="e.g. Laptop Pro 15"
+                           class="form-input"
+                           required
+                           autofocus/>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Category *</label>
+                        <select name="category" class="form-input" required>
+                            <option value="" disabled selected>
+                                Select category
+                            </option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Books">Books</option>
+                            <option value="Home">Home</option>
+                            <option value="Clothing">Clothing</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Stock Quantity *</label>
+                        <input type="number"
+                               name="stockQuantity"
+                               placeholder="e.g. 100"
+                               class="form-input"
+                               min="0"
+                               required/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Price (USD) *</label>
+                    <div class="price-input-wrapper">
+                        <span class="price-prefix">$</span>
+                        <input type="number"
+                               name="price"
+                               placeholder="0.00"
+                               class="form-input price-input"
+                               step="0.01"
+                               min="0"
+                               required/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description *</label>
+                    <textarea name="description"
+                              placeholder="Describe the product..."
+                              class="form-input form-textarea"
+                              required></textarea>
+                </div>
+
             </div>
-            <div class="form-row">
-                <input type="number"
-                       name="price"
-                       placeholder="Price (e.g. 99.99)"
-                       class="form-input"
-                       step="0.01"
-                       min="0"
-                       required/>
-                <input type="number"
-                       name="stockQuantity"
-                       placeholder="Stock Quantity"
-                       class="form-input"
-                       min="0"
-                       required/>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn-secondary"
+                        id="cancelAddProduct">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-primary">
+                    Add Product
+                </button>
             </div>
-            <textarea name="description"
-                      placeholder="Product Description"
-                      class="form-input form-textarea"
-                      required></textarea>
-            <button type="submit" class="btn-primary">Add Product</button>
+
         </form>
     </div>
-
 </div>
+<!-- ── End Modal ────────────────────────────────────────────────── -->
 
 <footer class="footer">
     <p>TechMart Online &mdash; Jakarta EE 10 &mdash; Payara 6 &mdash; MySQL</p>
