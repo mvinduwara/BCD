@@ -191,8 +191,53 @@ function initAddProductModal() {
     });
 }
 
-// ─── Init All ─────────────────────────────────────────────────────────────────
+function initImageUploadPreview() {
+    const input      = document.getElementById('productImageInput');
+    const preview    = document.getElementById('imagePreview');
+    const wrapper    = document.getElementById('imagePreviewWrapper');
+    const placeholder = document.getElementById('uploadPlaceholder');
+    const removeBtn  = document.getElementById('removeImage');
 
+    if (!input) return;
+
+    input.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file (JPG, PNG, WebP)');
+            this.value = '';
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image must be under 5MB');
+            this.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src         = e.target.result;
+            wrapper.style.display    = 'block';
+            placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    });
+
+    if (removeBtn) {
+        removeBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            input.value              = '';
+            preview.src              = '';
+            wrapper.style.display    = 'none';
+            placeholder.style.display = 'flex';
+        });
+    }
+}
+
+// ─── Init All ─────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
     initCartValidation();
     initAlertDismiss();
@@ -200,5 +245,6 @@ document.addEventListener('DOMContentLoaded', function () {
     initOrderCancelConfirm();
     initCheckoutToggle();
     initAddProductModal();
+    initImageUploadPreview();
     logPageLoadTime();
 });
