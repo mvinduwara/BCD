@@ -3,6 +3,7 @@ package com.techmart.web.servlet;
 import com.techmart.ejb.stateful.ShoppingCartBean;
 import com.techmart.ejb.stateless.OrderProcessingBean;
 import com.techmart.model.Order;
+import com.techmart.model.User;
 import jakarta.ejb.EJB;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,12 +14,14 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @WebServlet("/orders/*")
 public class OrderServlet extends HttpServlet {
 
-    private static final Logger logger = Logger.getLogger(OrderServlet.class.getName());
+    private static final Logger logger =
+            Logger.getLogger(OrderServlet.class.getName());
 
     @EJB
     private OrderProcessingBean orderProcessingBean;
@@ -29,6 +32,13 @@ public class OrderServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        if (!isLoggedIn(req)) {
+            req.getSession(true).setAttribute("redirectAfterLogin",
+                    req.getContextPath() + "/orders/");
+            resp.sendRedirect(req.getContextPath() + "/auth/login");
+            return;
+        }
 
         String pathInfo = req.getPathInfo();
 
@@ -48,6 +58,11 @@ public class OrderServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        if (!isLoggedIn(req)) {
+            resp.sendRedirect(req.getContextPath() + "/auth/login");
+            return;
+        }
+
         String pathInfo = req.getPathInfo();
 
         if (pathInfo != null && pathInfo.equals("/place")) {
@@ -62,18 +77,20 @@ public class OrderServlet extends HttpServlet {
         }
     }
 
-    private void handleListOrders(HttpServletRequest req, HttpServletResponse resp)
+    private void handleListOrders(HttpServletRequest req,
+                                  HttpServletResponse resp)
             throws ServletException, IOException {
 
         long start          = System.currentTimeMillis();
         HttpSession session = req.getSession(true);
         String customerId   = (String) session.getAttribute("customerId");
+        String userRole     = (String) session.getAttribute("userRole");
 
         List<Order> orders;
-        if (customerId != null) {
-            orders = orderProcessingBean.findOrdersByCustomer(customerId);
-        } else {
+        if ("ADMIN".equals(userRole)) {
             orders = orderProcessingBean.findAllOrders();
+        } else {
+            orders = orderProcessingBean.findOrdersByCustomer(customerId);
         }
 
         long elapsed = System.currentTimeMillis() - start;
@@ -83,16 +100,12 @@ public class OrderServlet extends HttpServlet {
         req.getRequestDispatcher("/orders.jsp").forward(req, resp);
     }
 
-    private void handleCheckoutPage(HttpServletRequest req, HttpServletResponse resp)
+    private void handleCheckoutPage(HttpServletRequest req,
+                                    HttpServletResponse resp)
             throws ServletException, IOException {
 
         HttpSession session = req.getSession(true);
         String customerId   = (String) session.getAttribute("customerId");
-
-        if (customerId == null) {
-            resp.sendRedirect(req.getContextPath() + "/cart/");
-            return;
-        }
 
         req.setAttribute("cartItems",  shoppingCartBean.getItems());
         req.setAttribute("cartTotal",  shoppingCartBean.getTotal());
@@ -101,7 +114,8 @@ public class OrderServlet extends HttpServlet {
         req.getRequestDispatcher("/cart.jsp").forward(req, resp);
     }
 
-    private void handleGetOrder(HttpServletRequest req, HttpServletResponse resp,
+    private void handleGetOrder(HttpServletRequest req,
+                                HttpServletResponse resp,
                                 String pathInfo)
             throws ServletException, IOException {
 
@@ -119,26 +133,22 @@ public class OrderServlet extends HttpServlet {
             req.getRequestDispatcher("/orders.jsp").forward(req, resp);
 
         } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid order ID");
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "Invalid order ID");
         }
     }
 
-    private void handlePlaceOrder(HttpServletRequest req, HttpServletResponse resp)
+    private void handlePlaceOrder(HttpServletRequest req,
+                                  HttpServletResponse resp)
             throws IOException {
 
         long start          = System.currentTimeMillis();
         HttpSession session = req.getSession(true);
         String customerId   = (String) session.getAttribute("customerId");
-        String email        = req.getParameter("email");
-
-        if (customerId == null || email == null || email.isBlank()) {
-            session.setAttribute("orderError", "Missing customer information.");
-            resp.sendRedirect(req.getContextPath() + "/orders/checkout");
-            return;
-        }
+        String email        = (String) session.getAttribute("userEmail");
 
         try {
-            java.util.Map<Long, Integer> productQuantities =
+            Map<Long, Integer> productQuantities =
                     shoppingCartBean.getProductQuantityMap();
 
             if (productQuantities.isEmpty()) {
@@ -154,7 +164,8 @@ public class OrderServlet extends HttpServlet {
             shoppingCartBean.checkout();
             session.removeAttribute("cartInitialized");
 
-            logger.info("Order " + order.getId() + " placed in " + elapsed + "ms");
+            logger.info("Order " + order.getId()
+                    + " placed in " + elapsed + "ms");
             session.setAttribute("orderSuccess",
                     "Order #" + order.getId() + " placed successfully!");
 
@@ -162,12 +173,14 @@ public class OrderServlet extends HttpServlet {
 
         } catch (Exception e) {
             logger.severe("Order placement failed: " + e.getMessage());
-            session.setAttribute("orderError", "Order failed: " + e.getMessage());
+            session.setAttribute("orderError",
+                    "Order failed: " + e.getMessage());
             resp.sendRedirect(req.getContextPath() + "/orders/checkout");
         }
     }
 
-    private void handleCancelOrder(HttpServletRequest req, HttpServletResponse resp,
+    private void handleCancelOrder(HttpServletRequest req,
+                                   HttpServletResponse resp,
                                    String pathInfo)
             throws IOException {
 
@@ -181,10 +194,16 @@ public class OrderServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/orders/");
 
         } catch (Exception e) {
-            logger.severe("Order cancellation failed: " + e.getMessage());
+            logger.severe("Cancellation failed: " + e.getMessage());
             req.getSession().setAttribute("orderError",
                     "Cancellation failed: " + e.getMessage());
             resp.sendRedirect(req.getContextPath() + "/orders/");
         }
+    }
+
+    private boolean isLoggedIn(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        return session != null
+                && session.getAttribute("loggedInUser") != null;
     }
 }
