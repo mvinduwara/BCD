@@ -5,19 +5,36 @@ import com.techmart.ejb.stateless.ProductCatalogBean;
 import com.techmart.model.Product;
 import jakarta.ejb.EJB;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 @WebServlet("/products/*")
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024,
+        maxFileSize       = 5 * 1024 * 1024,
+        maxRequestSize    = 10 * 1024 * 1024
+)
 public class ProductServlet extends HttpServlet {
 
-    private static final Logger logger = Logger.getLogger(ProductServlet.class.getName());
+    private static final Logger logger =
+            Logger.getLogger(ProductServlet.class.getName());
+
+    private static final String UPLOAD_DIR = "product-images";
 
     @EJB
     private ProductCatalogBean productCatalogBean;
@@ -26,7 +43,8 @@ public class ProductServlet extends HttpServlet {
     private InventoryManagerBean inventoryManagerBean;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    protected void doGet(HttpServletRequest req,
+                         HttpServletResponse resp)
             throws ServletException, IOException {
 
         long start    = System.currentTimeMillis();
@@ -48,11 +66,17 @@ public class ProductServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    protected void doPost(HttpServletRequest req,
+                          HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String pathInfo = req.getPathInfo();
+        if (!isAdmin(req)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN,
+                    "Admin access required");
+            return;
+        }
 
+        String pathInfo = req.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             handleCreateProduct(req, resp);
             return;
@@ -63,7 +87,8 @@ public class ProductServlet extends HttpServlet {
     }
 
     private void handleListProducts(HttpServletRequest req,
-                                    HttpServletResponse resp, long start)
+                                    HttpServletResponse resp,
+                                    long start)
             throws ServletException, IOException {
 
         List<Product> products = productCatalogBean.findAll();
@@ -73,7 +98,6 @@ public class ProductServlet extends HttpServlet {
         req.setAttribute("queryTimeMs",      elapsed);
         req.setAttribute("inventoryManager", inventoryManagerBean);
 
-        logger.info("Listed " + products.size() + " products in " + elapsed + "ms");
         req.getRequestDispatcher("/products.jsp").forward(req, resp);
     }
 
@@ -86,16 +110,17 @@ public class ProductServlet extends HttpServlet {
         List<Product> products = productCatalogBean.findByCategory(category);
         long elapsed           = System.currentTimeMillis() - start;
 
-        req.setAttribute("products",          products);
-        req.setAttribute("queryTimeMs",       elapsed);
-        req.setAttribute("selectedCategory",  category);
-        req.setAttribute("inventoryManager",  inventoryManagerBean);
+        req.setAttribute("products",         products);
+        req.setAttribute("queryTimeMs",      elapsed);
+        req.setAttribute("selectedCategory", category);
+        req.setAttribute("inventoryManager", inventoryManagerBean);
 
         req.getRequestDispatcher("/products.jsp").forward(req, resp);
     }
 
     private void handleSearch(HttpServletRequest req,
-                              HttpServletResponse resp, long start)
+                              HttpServletResponse resp,
+                              long start)
             throws ServletException, IOException {
 
         String keyword = req.getParameter("q");
@@ -132,36 +157,90 @@ public class ProductServlet extends HttpServlet {
             }
 
             int stock = inventoryManagerBean.getStock(productId);
-            req.setAttribute("product",      product);
-            req.setAttribute("stock",        stock);
-            req.setAttribute("queryTimeMs",  elapsed);
+            req.setAttribute("product",     product);
+            req.setAttribute("stock",       stock);
+            req.setAttribute("queryTimeMs", elapsed);
 
             req.getRequestDispatcher("/products.jsp").forward(req, resp);
 
         } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid product ID");
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "Invalid product ID");
         }
     }
 
     private void handleCreateProduct(HttpServletRequest req,
                                      HttpServletResponse resp)
-            throws IOException {
+            throws IOException, ServletException {
 
         try {
-            String name    = req.getParameter("name");
-            String desc    = req.getParameter("description");
-            double price   = Double.parseDouble(req.getParameter("price"));
-            int stock      = Integer.parseInt(req.getParameter("stockQuantity"));
+            String name     = req.getParameter("name");
+            String desc     = req.getParameter("description");
+            double price    = Double.parseDouble(req.getParameter("price"));
+            int stock       = Integer.parseInt(
+                    req.getParameter("stockQuantity"));
             String category = req.getParameter("category");
 
-            Product product = new Product(name, desc, price, stock, category);
+            String imageUrl = null;
+            Part imagePart  = req.getPart("productImage");
+
+            if (imagePart != null && imagePart.getSize() > 0) {
+                imageUrl = saveImage(req, imagePart);
+            }
+
+            Product product = new Product(
+                    name, desc, price, stock, category);
+            product.setImageUrl(imageUrl);
             productCatalogBean.save(product);
 
-            logger.info("Product created: " + name);
+            logger.info("Product created: " + name
+                    + (imageUrl != null ? " with image" : ""));
+
+            req.getSession().setAttribute("cartSuccess",
+                    "Product '" + name + "' added successfully.");
             resp.sendRedirect(req.getContextPath() + "/products/");
 
         } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid product data");
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "Invalid product data");
         }
+    }
+
+    private String saveImage(HttpServletRequest req, Part part)
+            throws IOException {
+
+        String appPath  = req.getServletContext().getRealPath("");
+        String uploadPath = appPath + File.separator + UPLOAD_DIR;
+
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()) uploadDir.mkdirs();
+
+        String originalName   = Paths.get(
+                part.getSubmittedFileName()).getFileName().toString();
+        String extension      = "";
+        int dotIndex          = originalName.lastIndexOf('.');
+        if (dotIndex > 0) {
+            extension = originalName.substring(dotIndex).toLowerCase();
+        }
+
+        if (!extension.matches("\\.(jpg|jpeg|png|webp|gif)")) {
+            extension = ".jpg";
+        }
+
+        String fileName = UUID.randomUUID().toString() + extension;
+        String filePath = uploadPath + File.separator + fileName;
+
+        try (InputStream input = part.getInputStream()) {
+            Files.copy(input, Paths.get(filePath),
+                    StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return req.getContextPath() + "/" + UPLOAD_DIR + "/" + fileName;
+    }
+
+    private boolean isAdmin(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        if (session == null) return false;
+        return "ADMIN".equals(session.getAttribute("userRole"));
     }
 }
