@@ -19,6 +19,26 @@
         <a href="${pageContext.request.contextPath}/cart/">Cart</a>
         <a href="${pageContext.request.contextPath}/orders/">Orders</a>
         <a href="${pageContext.request.contextPath}/metrics/">Metrics</a>
+        <c:choose>
+            <c:when test="${not empty sessionScope.userName}">
+                <span class="nav-user">
+                    &#128100; ${sessionScope.userName}
+                </span>
+                <c:if test="${sessionScope.userRole == 'ADMIN'}">
+                    <span class="nav-role-badge">ADMIN</span>
+                </c:if>
+                <a href="${pageContext.request.contextPath}/auth/logout"
+                   class="btn-secondary btn-sm nav-logout">
+                    Logout
+                </a>
+            </c:when>
+            <c:otherwise>
+                <a href="${pageContext.request.contextPath}/auth/login"
+                   class="btn-secondary btn-sm">Login</a>
+                <a href="${pageContext.request.contextPath}/auth/register"
+                   class="btn-primary btn-sm">Register</a>
+            </c:otherwise>
+        </c:choose>
     </div>
 </nav>
 
