@@ -11,6 +11,7 @@
         <class>com.techmart.model.Product</class>
         <class>com.techmart.model.Order</class>
         <class>com.techmart.model.OrderItem</class>
+        <class>com.techmart.model.User</class>
 
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
 
