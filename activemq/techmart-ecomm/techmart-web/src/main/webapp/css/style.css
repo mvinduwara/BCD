@@ -1022,6 +1022,7 @@ button:disabled {
     font-weight: 700;
     line-height: 1.3;
     letter-spacing: -0.2px;
+    color: #556b2f;
 }
 
 .product-desc {
@@ -1042,6 +1043,7 @@ button:disabled {
     font-size: 1.15rem;
     font-weight: 800;
     letter-spacing: -0.5px;
+    color: #b5303a;
 }
 
 .stock-badge {
@@ -1355,6 +1357,17 @@ button:disabled {
     font-size: 0.78rem;
     margin-top: auto;
     letter-spacing: 0.3px;
+    user-select: none;
+}
+
+.footer p {
+    color: var(--grey-400);
+    margin: 0;
+}
+
+.footer a {
+    color: var(--grey-400);
+    text-decoration: none;
 }
 
 /* ── Responsive ───────────────────────────────────────────────── */
