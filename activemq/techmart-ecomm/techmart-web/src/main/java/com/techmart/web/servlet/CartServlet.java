@@ -17,7 +17,8 @@ import java.util.logging.Logger;
 @WebServlet("/cart/*")
 public class CartServlet extends HttpServlet {
 
-    private static final Logger logger = Logger.getLogger(CartServlet.class.getName());
+    private static final Logger logger =
+            Logger.getLogger(CartServlet.class.getName());
 
     @EJB
     private ShoppingCartBean shoppingCartBean;
@@ -25,6 +26,13 @@ public class CartServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        if (!isLoggedIn(req)) {
+            req.getSession(true).setAttribute("redirectAfterLogin",
+                    req.getContextPath() + "/cart/");
+            resp.sendRedirect(req.getContextPath() + "/auth/login");
+            return;
+        }
 
         String pathInfo = req.getPathInfo();
 
@@ -44,6 +52,11 @@ public class CartServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        if (!isLoggedIn(req)) {
+            resp.sendRedirect(req.getContextPath() + "/auth/login");
+            return;
+        }
+
         String pathInfo = req.getPathInfo();
 
         if (pathInfo == null || pathInfo.equals("/")) {
@@ -61,10 +74,11 @@ public class CartServlet extends HttpServlet {
         }
     }
 
-    private void handleViewCart(HttpServletRequest req, HttpServletResponse resp)
+    private void handleViewCart(HttpServletRequest req,
+                                HttpServletResponse resp)
             throws ServletException, IOException {
 
-        long start = System.currentTimeMillis();
+        long start    = System.currentTimeMillis();
         ensureCartInitialized(req);
 
         List<CartItem> items = shoppingCartBean.getItems();
@@ -80,7 +94,8 @@ public class CartServlet extends HttpServlet {
         req.getRequestDispatcher("/cart.jsp").forward(req, resp);
     }
 
-    private void handleAddItem(HttpServletRequest req, HttpServletResponse resp)
+    private void handleAddItem(HttpServletRequest req,
+                               HttpServletResponse resp)
             throws IOException {
 
         ensureCartInitialized(req);
@@ -92,19 +107,22 @@ public class CartServlet extends HttpServlet {
             boolean added = shoppingCartBean.addItem(productId, quantity);
 
             if (added) {
-                logger.info("Added product " + productId + " x" + quantity + " to cart");
-                req.getSession().setAttribute("cartSuccess", "Item added to cart successfully.");
+                req.getSession().setAttribute("cartSuccess",
+                        "Item added to cart successfully.");
             } else {
-                req.getSession().setAttribute("cartError", "Insufficient stock for requested quantity.");
+                req.getSession().setAttribute("cartError",
+                        "Insufficient stock for requested quantity.");
             }
             resp.sendRedirect(req.getContextPath() + "/cart/");
 
         } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid product data");
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "Invalid product data");
         }
     }
 
-    private void handleUpdateItem(HttpServletRequest req, HttpServletResponse resp)
+    private void handleUpdateItem(HttpServletRequest req,
+                                  HttpServletResponse resp)
             throws IOException {
 
         ensureCartInitialized(req);
@@ -113,7 +131,8 @@ public class CartServlet extends HttpServlet {
             Long productId  = Long.parseLong(req.getParameter("productId"));
             int newQuantity = Integer.parseInt(req.getParameter("quantity"));
 
-            boolean updated = shoppingCartBean.updateQuantity(productId, newQuantity);
+            boolean updated = shoppingCartBean.updateQuantity(
+                    productId, newQuantity);
 
             if (!updated) {
                 req.getSession().setAttribute("cartError",
@@ -126,7 +145,8 @@ public class CartServlet extends HttpServlet {
         }
     }
 
-    private void handleRemoveItem(HttpServletRequest req, HttpServletResponse resp)
+    private void handleRemoveItem(HttpServletRequest req,
+                                  HttpServletResponse resp)
             throws IOException {
 
         ensureCartInitialized(req);
@@ -137,11 +157,13 @@ public class CartServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/cart/");
 
         } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid product ID");
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "Invalid product ID");
         }
     }
 
-    private void handleClearCart(HttpServletRequest req, HttpServletResponse resp)
+    private void handleClearCart(HttpServletRequest req,
+                                 HttpServletResponse resp)
             throws IOException {
 
         ensureCartInitialized(req);
@@ -150,19 +172,26 @@ public class CartServlet extends HttpServlet {
     }
 
     private void ensureCartInitialized(HttpServletRequest req) {
-        HttpSession session   = req.getSession(true);
-        String customerId     = (String) session.getAttribute("customerId");
+        HttpSession session = req.getSession(true);
+        String customerId   = (String) session.getAttribute("customerId");
 
         if (customerId == null) {
-            customerId = "GUEST-" + session.getId().substring(0, 8).toUpperCase();
+            customerId = "GUEST-"
+                    + session.getId().substring(0, 8).toUpperCase();
             session.setAttribute("customerId", customerId);
         }
 
-        String cartInitialized = (String) session.getAttribute("cartInitialized");
+        String cartInitialized =
+                (String) session.getAttribute("cartInitialized");
         if (cartInitialized == null) {
             shoppingCartBean.initCart(customerId);
             session.setAttribute("cartInitialized", "true");
-            logger.info("Cart initialized for session: " + customerId);
         }
+    }
+
+    private boolean isLoggedIn(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        return session != null
+                && session.getAttribute("loggedInUser") != null;
     }
 }
