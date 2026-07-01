@@ -65,7 +65,7 @@
 </div>
 
 <footer class="footer">
-    <p>TechMart Online &mdash; Jakarta EE 10 &mdash; Payara 6 &mdash; MySQL</p>
+    <p>TechMart Online</p>
 </footer>
 
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
