@@ -297,7 +297,7 @@ button:disabled {
 
 /* ── Product Grid ─────────────────────────────────────────────── */
 .product-grid {
-    display: grid;
+    display: none;
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
     margin-bottom: 2.5rem;
@@ -311,7 +311,7 @@ button:disabled {
 
 @media (max-width: 768px) {
     .product-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
