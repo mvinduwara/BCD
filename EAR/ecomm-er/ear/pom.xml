@@ -63,6 +63,7 @@
                             <artifactId>web</artifactId>
                             <contextRoot>/ee-web</contextRoot>
                             <bundleFileName>web.war</bundleFileName> </webModule>
+
                     </modules>
                 </configuration>
             </plugin>
