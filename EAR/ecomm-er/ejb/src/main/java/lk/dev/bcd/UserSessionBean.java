@@ -26,7 +26,6 @@ public class UserSessionBean implements UserService {
     public void deleteUser(Long id) {
         System.out.println("deleteUser");
     }
-
     @Override
     public List<UserDTO> getAllUsers() {
         return List.of();
