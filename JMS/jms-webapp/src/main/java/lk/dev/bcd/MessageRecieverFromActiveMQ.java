@@ -5,7 +5,6 @@ import jakarta.ejb.MessageDriven;
 import jakarta.jms.Message;
 import jakarta.jms.MessageListener;
 
-
 @MessageDriven(activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationType",propertyValue = "jakartha.jms.Topic"),
         @ActivationConfigProperty(propertyName = "destinationLookup",propertyValue = "activeMQTopic"),
