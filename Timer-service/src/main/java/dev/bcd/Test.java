@@ -1,5 +1,6 @@
 package dev.bcd;
 
+import jakarta.servlet.AsyncContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,6 +16,8 @@ public class Test extends HttpServlet {
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 //        super.service(req, resp);
         resp.getWriter().write("This Is Test Servlet");
+
+        AsyncContext asyncContext = req.startAsync();
 
     }
 }
