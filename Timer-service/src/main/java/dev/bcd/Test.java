@@ -15,7 +15,7 @@ public class Test extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //        super.service(req, resp);
-        
+
         System.out.println("Start : " + Thread.currentThread().getName());
 
         AsyncContext async = request.startAsync();
