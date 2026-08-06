@@ -20,7 +20,7 @@ public class CustomFormLogin extends HttpServlet {
 
        // request.getSession().setAttribute("username", username);
 
-        request.login("user", "1234");
+        request.login(username, password);
         response.sendRedirect(request.getContextPath() + "/user");
 
     }
