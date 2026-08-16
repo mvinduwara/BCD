@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.globaltrade</groupId>
+        <artifactId>globaltrade-scm</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>scm-ear</artifactId>
+    <packaging>ear</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.globaltrade</groupId>
+            <artifactId>scm-ejb</artifactId>
+            <type>ejb</type>
+        </dependency>
+        <dependency>
+            <groupId>com.globaltrade</groupId>
+            <artifactId>scm-web</artifactId>
+            <type>war</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>globaltrade-scm</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <generateApplicationXml>false</generateApplicationXml>
+                    <applicationXml>src/main/application/META-INF/application.xml</applicationXml>
+                    <modules>
+                        <ejbModule>
+                            <groupId>com.globaltrade</groupId>
+                            <artifactId>scm-ejb</artifactId>
+                        </ejbModule>
+                        <webModule>
+                            <groupId>com.globaltrade</groupId>
+                            <artifactId>scm-web</artifactId>
+                            <contextRoot>/scm</contextRoot>
+                        </webModule>
+                    </modules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
