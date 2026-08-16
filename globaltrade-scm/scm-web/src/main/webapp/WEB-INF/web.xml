@@ -4,4 +4,26 @@
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
     <display-name>scm-web</display-name>
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>scmRealm</realm-name>
+    </login-config>
+    <security-role>
+        <role-name>COORDINATOR</role-name>
+    </security-role>
+    <security-role>
+        <role-name>CUSTOMS_AGENT</role-name>
+    </security-role>
+    <security-role>
+        <role-name>WAREHOUSE_MANAGER</role-name>
+    </security-role>
+    <security-role>
+        <role-name>VENDOR_REPRESENTATIVE</role-name>
+    </security-role>
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+        </cookie-config>
+    </session-config>
 </web-app>

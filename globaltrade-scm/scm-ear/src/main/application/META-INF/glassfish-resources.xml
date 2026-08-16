@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glassfish-application PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 Java EE Application//EN" "https://glassfish.org/dtds/glassfish-application_7_0-1.dtd">
+<glassfish-application>
+    <security-role-mapping>
+        <role-name>COORDINATOR</role-name>
+        <principal-name>COORDINATOR</principal-name>
+    </security-role-mapping>
+    <security-role-mapping>
+        <role-name>CUSTOMS_AGENT</role-name>
+        <principal-name>CUSTOMS_AGENT</principal-name>
+    </security-role-mapping>
+    <security-role-mapping>
+        <role-name>WAREHOUSE_MANAGER</role-name>
+        <principal-name>WAREHOUSE_MANAGER</principal-name>
+    </security-role-mapping>
+    <security-role-mapping>
+        <role-name>VENDOR_REPRESENTATIVE</role-name>
+        <principal-name>VENDOR_REPRESENTATIVE</principal-name>
+    </security-role-mapping>
+</glassfish-application>
