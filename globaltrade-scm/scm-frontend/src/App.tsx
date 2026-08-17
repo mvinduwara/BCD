@@ -7,7 +7,7 @@ import { Dashboard } from './pages/dashboard/Dashboard';
 import { ShipmentsPage } from './pages/shipments/ShipmentsPage';
 import { VendorsPage } from './pages/vendors/VendorsPage';
 import { InventoryPage } from './pages/inventory/InventoryPage';
-import { CustomsPage } from './pages/customs/CustomsPage';
+import { CustomsPage } from './pages/customers/CustomsPage';
 import { authApi } from './api/auth';
 import { useAuthStore } from './store/authStore';
 
