@@ -51,7 +51,7 @@ public class CustomsResource {
         } catch (ShipmentNotFoundException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(Map.of("message", e.getMessage())).build();
         } catch (CustomsComplianceException e) {
-            return Response.status(Response.Status.UNPROCESSABLE_ENTITY).entity(Map.of("message", e.getMessage())).build();
+            return Response.status(422).entity(Map.of("message", e.getMessage())).build();
         }
     }
 

@@ -38,11 +38,13 @@
                         <ejbModule>
                             <groupId>com.globaltrade</groupId>
                             <artifactId>scm-ejb</artifactId>
+                            <bundleFileName>scm-ejb.jar</bundleFileName>
                         </ejbModule>
                         <webModule>
                             <groupId>com.globaltrade</groupId>
                             <artifactId>scm-web</artifactId>
                             <contextRoot>/scm</contextRoot>
+                            <bundleFileName>scm-web.war</bundleFileName>
                         </webModule>
                     </modules>
                 </configuration>
