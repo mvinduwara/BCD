@@ -25,10 +25,14 @@ export function Login() {
             setSession(session);
             navigate('/');
         } catch (err) {
-            if (err instanceof ApiError && err.status === 401) {
-                setError('Those credentials were not recognized');
+            if (err instanceof ApiError) {
+                if (err.status === 401) {
+                    setError('Those credentials were not recognized');
+                } else {
+                    setError(`Server responded with an error (status ${err.status}) — check the Payara log`);
+                }
             } else {
-                setError('Could not reach the server');
+                setError('Could not reach the server — is Payara running with the EAR deployed?');
             }
         } finally {
             setLoading(false);
@@ -76,7 +80,7 @@ export function Login() {
                     </button>
                 </form>
                 <p className="mt-6 text-xs text-ink-500">
-                    Demo accounts: coordinator1, customs1, warehouse1, vendor1 — any password
+                    Demo accounts: coordinator1, customs1, warehouse1, vendor1 — password: password123
                 </p>
             </div>
         </div>
