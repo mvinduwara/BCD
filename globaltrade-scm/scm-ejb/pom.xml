@@ -16,6 +16,7 @@
         <dependency>
             <groupId>com.globaltrade</groupId>
             <artifactId>scm-common</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.platform</groupId>

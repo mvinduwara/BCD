@@ -15,6 +15,10 @@
     <dependencies>
         <dependency>
             <groupId>com.globaltrade</groupId>
+            <artifactId>scm-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.globaltrade</groupId>
             <artifactId>scm-ejb</artifactId>
             <type>ejb</type>
         </dependency>

@@ -16,11 +16,13 @@
         <dependency>
             <groupId>com.globaltrade</groupId>
             <artifactId>scm-common</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.globaltrade</groupId>
             <artifactId>scm-ejb</artifactId>
             <type>ejb</type>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.platform</groupId>
