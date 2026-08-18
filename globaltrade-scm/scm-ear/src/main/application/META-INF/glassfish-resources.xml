@@ -15,7 +15,7 @@
         <property name="portNumber" value="3306"/>
         <property name="databaseName" value="scm_db"/>
         <property name="user" value="scm_app"/>
-        <property name="password" value="change_me"/>
+        <property name="password" value="Manilka@8576"/>
         <property name="useSSL" value="false"/>
         <property name="allowPublicKeyRetrieval" value="true"/>
         <property name="serverTimezone" value="UTC"/>
