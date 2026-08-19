@@ -41,44 +41,30 @@ public class ShipmentResource {
 
     @GET
     @Path("/{id}")
-    public Response get(@PathParam("id") Long id) {
-        try {
-            return Response.ok(shipmentService.findById(id)).build();
-        } catch (ShipmentNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("message", e.getMessage())).build();
-        }
+    public ShipmentDTO get(@PathParam("id") Long id) throws ShipmentNotFoundException {
+        return shipmentService.findById(id);
     }
 
     @POST
-    public Response create(ShipmentDTO input) {
-        try {
-            return Response.status(Response.Status.CREATED).entity(shipmentService.create(input)).build();
-        } catch (VendorNotFoundException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(Map.of("message", e.getMessage())).build();
-        }
+    public Response create(ShipmentDTO input) throws VendorNotFoundException {
+        ShipmentDTO created = shipmentService.create(input);
+        return Response.status(Response.Status.CREATED).entity(created).build();
     }
 
     @PUT
     @Path("/{id}/status")
-    public Response updateStatus(@PathParam("id") Long id, Map<String, String> body) {
-        try {
-            ShipmentStatus status = ShipmentStatus.valueOf(body.get("status"));
-            return Response.ok(shipmentService.updateStatus(id, status)).build();
-        } catch (ShipmentNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("message", e.getMessage())).build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(Map.of("message", "Unknown status: " + body.get("status"))).build();
-        }
+    public ShipmentDTO updateStatus(@PathParam("id") Long id, Map<String, String> body) throws ShipmentNotFoundException {
+        ShipmentStatus status = ShipmentStatus.valueOf(body.get("status"));
+        return shipmentService.updateStatus(id, status);
     }
 
     @PUT
     @Path("/bulk-status")
-    public Response bulkUpdateStatus(Map<String, String> body) {
+    public BatchUpdateResult bulkUpdateStatus(Map<String, String> body) {
         Map<Long, ShipmentStatus> updates = new HashMap<>();
         for (Map.Entry<String, String> entry : body.entrySet()) {
             updates.put(Long.parseLong(entry.getKey()), ShipmentStatus.valueOf(entry.getValue()));
         }
-        BatchUpdateResult result = shipmentBatchService.bulkUpdateStatus(updates);
-        return Response.ok(result).build();
+        return shipmentBatchService.bulkUpdateStatus(updates);
     }
 }

@@ -33,31 +33,20 @@ public class VendorResource {
 
     @GET
     @Path("/{id}")
-    public Response get(@PathParam("id") Long id) {
-        try {
-            return Response.ok(vendorService.findById(id)).build();
-        } catch (VendorNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("message", e.getMessage())).build();
-        }
+    public VendorDTO get(@PathParam("id") Long id) throws VendorNotFoundException {
+        return vendorService.findById(id);
     }
 
     @POST
-    public Response create(VendorDTO input) {
-        try {
-            return Response.status(Response.Status.CREATED).entity(vendorService.create(input)).build();
-        } catch (VendorValidationException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(Map.of("message", e.getMessage())).build();
-        }
+    public Response create(VendorDTO input) throws VendorValidationException {
+        VendorDTO created = vendorService.create(input);
+        return Response.status(Response.Status.CREATED).entity(created).build();
     }
 
     @GET
     @Path("/{id}/performance")
-    public Response performance(@PathParam("id") Long id) {
-        try {
-            VendorDTO vendor = vendorService.findById(id);
-            return Response.ok(Map.of("vendorId", id, "score", vendor.performanceScore())).build();
-        } catch (VendorNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("message", e.getMessage())).build();
-        }
+    public Map<String, Object> performance(@PathParam("id") Long id) throws VendorNotFoundException {
+        VendorDTO vendor = vendorService.findById(id);
+        return Map.of("vendorId", id, "score", vendor.performanceScore());
     }
 }

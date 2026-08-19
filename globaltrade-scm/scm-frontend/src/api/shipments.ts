@@ -1,11 +1,10 @@
 import { apiClient } from './client';
-import type { Shipment } from './types';
+import type { Shipment, ShipmentStatus, BatchUpdateResult } from './types';
 
 export const shipmentsApi = {
     list: () => apiClient.get<Shipment[]>('/shipments'),
     get: (id: number) => apiClient.get<Shipment>(`/shipments/${id}`),
     create: (shipment: Omit<Shipment, 'id' | 'status'>) => apiClient.post<Shipment>('/shipments', shipment),
     updateStatus: (id: number, status: ShipmentStatus) => apiClient.put<Shipment>(`/shipments/${id}/status`, { status }),
+    bulkUpdateStatus: (updates: Record<string, string>) => apiClient.put<BatchUpdateResult>('/shipments/bulk-status', updates),
 };
-
-type ShipmentStatus = Shipment['status'];

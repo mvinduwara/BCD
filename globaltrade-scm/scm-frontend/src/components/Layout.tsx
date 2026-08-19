@@ -9,6 +9,7 @@ const NAV_ITEMS: { to: string; label: string; roles: Role[] }[] = [
     { to: '/vendors', label: 'Vendors', roles: ['COORDINATOR', 'WAREHOUSE_MANAGER', 'VENDOR_REPRESENTATIVE'] },
     { to: '/inventory', label: 'Inventory', roles: ['COORDINATOR', 'WAREHOUSE_MANAGER'] },
     { to: '/customs', label: 'Customs', roles: ['COORDINATOR', 'CUSTOMS_AGENT'] },
+    { to: '/purchase-orders', label: 'Purchase orders', roles: ['COORDINATOR', 'WAREHOUSE_MANAGER', 'VENDOR_REPRESENTATIVE'] },
 ];
 
 export function Layout() {

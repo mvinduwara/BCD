@@ -7,7 +7,8 @@ import { Dashboard } from './pages/dashboard/Dashboard';
 import { ShipmentsPage } from './pages/shipments/ShipmentsPage';
 import { VendorsPage } from './pages/vendors/VendorsPage';
 import { InventoryPage } from './pages/inventory/InventoryPage';
-import { CustomsPage } from './pages/customers/CustomsPage';
+import { CustomsPage } from './pages/customs/CustomsPage';
+import { PurchaseOrdersPage } from './pages/purchaseorders/PurchaseOrdersPage';
 import { authApi } from './api/auth';
 import { useAuthStore } from './store/authStore';
 
@@ -81,6 +82,14 @@ export function App() {
                         element={
                             <ProtectedRoute roles={['COORDINATOR', 'CUSTOMS_AGENT']}>
                                 <CustomsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/purchase-orders"
+                        element={
+                            <ProtectedRoute roles={['COORDINATOR', 'WAREHOUSE_MANAGER', 'VENDOR_REPRESENTATIVE']}>
+                                <PurchaseOrdersPage />
                             </ProtectedRoute>
                         }
                     />

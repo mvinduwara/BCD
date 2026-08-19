@@ -17,7 +17,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
-import java.util.Map;
 
 @Path("/customs")
 @Produces(MediaType.APPLICATION_JSON)
@@ -35,24 +34,15 @@ public class CustomsResource {
 
     @GET
     @Path("/documents/{id}")
-    public Response get(@PathParam("id") Long id) {
-        try {
-            return Response.ok(customsService.findById(id)).build();
-        } catch (CustomsDocumentNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("message", e.getMessage())).build();
-        }
+    public CustomsDocumentDTO get(@PathParam("id") Long id) throws CustomsDocumentNotFoundException {
+        return customsService.findById(id);
     }
 
     @POST
     @Path("/documents")
-    public Response create(CustomsDocumentDTO input) {
-        try {
-            return Response.status(Response.Status.CREATED).entity(customsService.create(input)).build();
-        } catch (ShipmentNotFoundException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(Map.of("message", e.getMessage())).build();
-        } catch (CustomsComplianceException e) {
-            return Response.status(422).entity(Map.of("message", e.getMessage())).build();
-        }
+    public Response create(CustomsDocumentDTO input) throws ShipmentNotFoundException, CustomsComplianceException {
+        CustomsDocumentDTO created = customsService.create(input);
+        return Response.status(Response.Status.CREATED).entity(created).build();
     }
 
     @GET

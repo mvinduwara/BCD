@@ -12,7 +12,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 import java.util.Map;
@@ -32,22 +31,14 @@ public class InventoryResource {
 
     @GET
     @Path("/{itemId}")
-    public Response get(@PathParam("itemId") Long itemId) {
-        try {
-            return Response.ok(inventoryService.findById(itemId)).build();
-        } catch (InventoryItemNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("message", e.getMessage())).build();
-        }
+    public InventoryItemDTO get(@PathParam("itemId") Long itemId) throws InventoryItemNotFoundException {
+        return inventoryService.findById(itemId);
     }
 
     @PUT
     @Path("/{itemId}/quantity")
-    public Response updateQuantity(@PathParam("itemId") Long itemId, Map<String, Integer> body) {
-        try {
-            return Response.ok(inventoryService.updateQuantity(itemId, body.get("quantityOnHand"))).build();
-        } catch (InventoryItemNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("message", e.getMessage())).build();
-        }
+    public InventoryItemDTO updateQuantity(@PathParam("itemId") Long itemId, Map<String, Integer> body) throws InventoryItemNotFoundException {
+        return inventoryService.updateQuantity(itemId, body.get("quantityOnHand"));
     }
 
     @GET

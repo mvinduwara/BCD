@@ -39,6 +39,26 @@ export interface CustomsDocument {
     countryCode: string;
 }
 
+export interface PurchaseOrder {
+    id: number;
+    vendorId: number;
+    inventoryItemId: number;
+    quantity: number;
+    status: 'PLACED' | 'CONFIRMED' | 'FULFILLED' | 'CANCELLED';
+    orderDate: string;
+}
+
+export interface PlacePurchaseOrderRequest {
+    vendorId: number;
+    inventoryItemId: number;
+    quantity: number;
+}
+
+export interface BatchUpdateResult {
+    succeeded: number[];
+    failed: { id: number; reason: string }[];
+}
+
 export type Role = 'COORDINATOR' | 'CUSTOMS_AGENT' | 'WAREHOUSE_MANAGER' | 'VENDOR_REPRESENTATIVE';
 
 export interface Session {

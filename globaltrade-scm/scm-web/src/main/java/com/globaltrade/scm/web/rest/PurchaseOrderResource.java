@@ -20,7 +20,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
-import java.util.Map;
 
 @Path("/purchase-orders")
 @Produces(MediaType.APPLICATION_JSON)
@@ -36,32 +35,20 @@ public class PurchaseOrderResource {
     }
 
     @POST
-    public Response place(PlacePurchaseOrderRequest request) {
-        try {
-            PurchaseOrderDTO order = purchaseOrderService.place(request.vendorId(), request.inventoryItemId(), request.quantity());
-            return Response.status(Response.Status.CREATED).entity(order).build();
-        } catch (VendorNotFoundException | InventoryItemNotFoundException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(Map.of("message", e.getMessage())).build();
-        }
+    public Response place(PlacePurchaseOrderRequest request) throws VendorNotFoundException, InventoryItemNotFoundException {
+        PurchaseOrderDTO order = purchaseOrderService.place(request.vendorId(), request.inventoryItemId(), request.quantity());
+        return Response.status(Response.Status.CREATED).entity(order).build();
     }
 
     @PUT
     @Path("/{id}/confirm")
-    public Response confirm(@PathParam("id") Long id) throws AccessDeniedException {
-        try {
-            return Response.ok(purchaseOrderService.confirm(id)).build();
-        } catch (PurchaseOrderNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("message", e.getMessage())).build();
-        }
+    public PurchaseOrderDTO confirm(@PathParam("id") Long id) throws PurchaseOrderNotFoundException, AccessDeniedException {
+        return purchaseOrderService.confirm(id);
     }
 
     @PUT
     @Path("/{id}/fulfill")
-    public Response fulfill(@PathParam("id") Long id) {
-        try {
-            return Response.ok(purchaseOrderService.fulfill(id)).build();
-        } catch (PurchaseOrderNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("message", e.getMessage())).build();
-        }
+    public PurchaseOrderDTO fulfill(@PathParam("id") Long id) throws PurchaseOrderNotFoundException {
+        return purchaseOrderService.fulfill(id);
     }
 }

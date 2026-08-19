@@ -18,6 +18,8 @@ function toneForStatus(status: ShipmentStatus): StatusTone {
     }
 }
 
+const STATUS_OPTIONS: ShipmentStatus[] = ['PENDING', 'IN_TRANSIT', 'CUSTOMS_HOLD', 'DELIVERED', 'DELAYED', 'CANCELLED'];
+
 export function ShipmentsPage() {
     const [shipments, setShipments] = useState<Shipment[]>([]);
     const [loading, setLoading] = useState(true);
@@ -26,6 +28,10 @@ export function ShipmentsPage() {
     const [trackingNumber, setTrackingNumber] = useState('');
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+    const [bulkStatus, setBulkStatus] = useState<ShipmentStatus>('IN_TRANSIT');
+    const [bulkResult, setBulkResult] = useState<string | null>(null);
+    const [bulkRunning, setBulkRunning] = useState(false);
 
     async function refresh() {
         setLoading(true);
@@ -58,6 +64,37 @@ export function ShipmentsPage() {
         setOrigin('');
         setDestination('');
         setShowForm(false);
+        refresh();
+    }
+
+    function toggleSelected(id: number) {
+        setSelectedIds((current) => {
+            const next = new Set(current);
+            if (next.has(id)) {
+                next.delete(id);
+            } else {
+                next.add(id);
+            }
+            return next;
+        });
+    }
+
+    function toggleSelectAll() {
+        setSelectedIds((current) => (current.size === shipments.length ? new Set() : new Set(shipments.map((shipment) => shipment.id))));
+    }
+
+    async function applyBulkStatus() {
+        if (selectedIds.size === 0) return;
+        setBulkRunning(true);
+        setBulkResult(null);
+        const updates: Record<string, string> = {};
+        selectedIds.forEach((id) => {
+            updates[String(id)] = bulkStatus;
+        });
+        const result = await shipmentsApi.bulkUpdateStatus(updates);
+        setBulkResult(`${result.succeeded.length} updated, ${result.failed.length} failed`);
+        setBulkRunning(false);
+        setSelectedIds(new Set());
         refresh();
     }
 
@@ -112,6 +149,32 @@ export function ShipmentsPage() {
                 </form>
             )}
 
+            {selectedIds.size > 0 && (
+                <div className="border border-ink-900 p-4 mb-4 flex items-center gap-4">
+                    <p className="text-sm font-medium">{selectedIds.size} selected</p>
+                    <select
+                        value={bulkStatus}
+                        onChange={(event) => setBulkStatus(event.target.value as ShipmentStatus)}
+                        className="border border-ink-300 px-3 py-1.5 text-sm bg-paper focus:outline-none focus:border-ink-900"
+                    >
+                        {STATUS_OPTIONS.map((status) => (
+                            <option key={status} value={status}>
+                                {status.replace(/_/g, ' ')}
+                            </option>
+                        ))}
+                    </select>
+                    <button
+                        type="button"
+                        onClick={applyBulkStatus}
+                        disabled={bulkRunning}
+                        className="bg-ink-900 text-paper px-4 py-1.5 text-sm font-medium disabled:opacity-50"
+                    >
+                        {bulkRunning ? 'Applying' : 'Apply to selected'}
+                    </button>
+                    {bulkResult && <p className="text-xs font-mono text-ink-500">{bulkResult}</p>}
+                </div>
+            )}
+
             {loading ? (
                 <p className="text-sm text-ink-500">Loading</p>
             ) : shipments.length === 0 ? (
@@ -120,6 +183,9 @@ export function ShipmentsPage() {
                 <table className="w-full text-sm border border-ink-200">
                     <thead>
                     <tr className="border-b border-ink-200 text-left">
+                        <th className="p-3 w-10">
+                            <input type="checkbox" checked={selectedIds.size === shipments.length} onChange={toggleSelectAll} />
+                        </th>
                         <th className="p-3 font-mono text-xs uppercase tracking-widest text-ink-500 font-medium">Tracking</th>
                         <th className="p-3 font-mono text-xs uppercase tracking-widest text-ink-500 font-medium">Route</th>
                         <th className="p-3 font-mono text-xs uppercase tracking-widest text-ink-500 font-medium">Status</th>
@@ -129,6 +195,13 @@ export function ShipmentsPage() {
                     <tbody className="divide-y divide-ink-200">
                     {shipments.map((shipment) => (
                         <tr key={shipment.id}>
+                            <td className="p-3">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedIds.has(shipment.id)}
+                                    onChange={() => toggleSelected(shipment.id)}
+                                />
+                            </td>
                             <td className="p-3 font-mono">{shipment.trackingNumber}</td>
                             <td className="p-3">
                                 {shipment.origin} → {shipment.destination}

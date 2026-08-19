@@ -1,9 +1,6 @@
 package com.globaltrade.scm.exception;
 
-import jakarta.ejb.ApplicationException;
-
-@ApplicationException(rollback = false)
-public class VendorValidationException extends Exception {
+public class VendorValidationException extends ScmValidationException {
     public VendorValidationException(String message) {
         super(message);
     }
