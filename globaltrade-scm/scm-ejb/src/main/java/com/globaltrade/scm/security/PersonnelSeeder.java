@@ -10,6 +10,10 @@ import jakarta.ejb.Startup;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -42,8 +46,7 @@ public class PersonnelSeeder {
                 .setMaxResults(1)
                 .getResultList();
         if (matches.isEmpty()) {
-            LOGGER.warning(() -> "No vendor named '" + name + "' — seeding vendor1 with no linked vendor. "
-                    + "Run the phase-4 vendor seed data first to get the ownership-check demo working.");
+            LOGGER.warning(() -> "No vendor named '" + name + "' — seeding vendor1 with no linked vendor.");
             return null;
         }
         return matches.get(0);
@@ -52,11 +55,21 @@ public class PersonnelSeeder {
     private void createAccount(String username, String fullName, PersonnelRole role, String email, Vendor vendor) {
         Personnel personnel = new Personnel();
         personnel.setUsername(username);
-        personnel.setPasswordHash(PasswordHasher.hash(DEMO_PASSWORD));
+        personnel.setPasswordHash(digest(DEMO_PASSWORD));
         personnel.setFullName(fullName);
         personnel.setRole(role);
         personnel.setEmail(email);
         personnel.setVendor(vendor);
         entityManager.persist(personnel);
+    }
+
+    private String digest(String rawPassword) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            byte[] hashed = messageDigest.digest(rawPassword.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hashed);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }
