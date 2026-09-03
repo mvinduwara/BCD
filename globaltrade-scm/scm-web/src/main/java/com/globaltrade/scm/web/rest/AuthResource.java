@@ -16,11 +16,14 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 @Path("/auth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class AuthResource {
+
+    private static final Logger LOGGER = Logger.getLogger(AuthResource.class.getName());
 
     private static final String[] KNOWN_ROLES = {
             "COORDINATOR", "CUSTOMS_AGENT", "WAREHOUSE_MANAGER", "VENDOR_REPRESENTATIVE"
@@ -39,6 +42,7 @@ public class AuthResource {
                     .entity(Map.of("message", "Invalid username or password"))
                     .build();
         }
+        httpServletRequest.getSession(true);
         return buildSessionResponse();
     }
 
@@ -84,6 +88,4 @@ public class AuthResource {
         }
         return null;
     }
-
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(AuthResource.class.getName());
 }
